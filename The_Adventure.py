@@ -4,7 +4,7 @@ import random
 
 WIDTH = 800
 HEIGHT = 600
-FPS = 60
+FPS = 30
 
 #Useful colors
 WHITE = (255,255,255)
@@ -25,7 +25,8 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((40,50))
-        self.image.fill(VIOLET)
+        self.image.fill(WHITE)
+        # self.game = game
         #self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH/2
@@ -35,6 +36,7 @@ class Player(pygame.sprite.Sprite):
         self.acceleration = vec(0,0)
     def jump(self):
         self.velocity.y = -10
+        
     def update(self):
         self.acceleration = vec (0,PLAYER_GRAVITY)
         keystate = pygame.key.get_pressed()
@@ -61,7 +63,7 @@ class Platform (pygame.sprite.Sprite):
     def __init__(self,x, y, w, h):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((w,h))
-        self.image.fill((GREEN))
+        self.image.fill((CYAN))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -89,6 +91,7 @@ all_platforms.add(p2)
 #game loop
 running = False
 while not running:
+    hits = None
     #keep loop running at right speed
     clock.tick(FPS)
     #process input(events)
@@ -98,11 +101,14 @@ while not running:
             pygame.quit()
             quit()
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
+            hits = pygame.sprite.spritecollide(player, all_platforms, False)
+            if event.key == pygame.K_UP and hits:
                 player.jump()
     # Update
     all_sprites.update()
     hits = pygame.sprite.spritecollide(player, all_platforms, False)
+    
+
     if hits:
         player.position.y = hits[0].rect.top
         player.velocity.y = -0.3
@@ -110,7 +116,7 @@ while not running:
 
 
     # draw/render
-    DISPLAY.fill(BLACK)
+    DISPLAY.fill(RED)
     all_sprites.draw(DISPLAY)
 
 #*after* drawing everything, update display at the end of each loop iteration
